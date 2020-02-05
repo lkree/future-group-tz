@@ -1,26 +1,35 @@
-import React from "react";
-import 'bootstrap/dist/css/bootstrap.css';
-import {Button, Container, Row, Col} from "reactstrap";
+import React, {useState, Suspense, lazy} from "react";
+import {Button, Container, Row, Col, Spinner} from "reactstrap";
 
 const WelcomeScreen = () => {
+  const [isTableRendered, renderTable] = useState(false);
   const buttonData = [
     {
       name: 'Full',
       color: 'danger',
+      key: 'Full',
+      onClick: () => renderTable('full'),
     },
     {
       name: 'Partial',
       color: 'success',
+      key: 'Partial',
+      onClick: () => renderTable('partial'),
     }
   ];
+  const DataTable = lazy(() => import('./DataTable'));
 
   return (
-    <Container style={{height: '100vh'}} className={'d-flex justify-content-center align-items-center'}>
+    <Container style={{minHeight: '100vh'}} className={'d-flex justify-content-center align-items-center'}>
       <Row>
         <Col className={'d-flex justify-content-center'}>
-        {buttonData.map(b => (
-            <Button color={b.color} key={b.name} className={'ml-2'}>{b.name}</Button>
-        ))}
+        {isTableRendered ?
+          <Suspense fallback={<Spinner color={'primary'}/>}>
+            <DataTable tableType={isTableRendered}/>
+          </Suspense> :
+          buttonData.map(b => (
+            <Button {...b}>{b.name}</Button>
+          ))}
         </Col>
       </Row>
     </Container>
